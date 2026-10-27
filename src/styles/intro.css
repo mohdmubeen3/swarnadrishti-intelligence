@@ -1,0 +1,360 @@
+/* Cinematic Intro Animation Styles for SwarnaDrishti */
+
+.intro-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background-color: #050811;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.8s;
+  opacity: 1;
+  visibility: visible;
+}
+
+.intro-overlay.fade-out {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* Supplied Fullscreen Background: Gold Market Trading Desk */
+.intro-bg-image-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.intro-bg-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 60%;
+  filter: brightness(0.92) contrast(1.06);
+  transform: scale(1.02);
+  transition: transform 12s ease-out;
+}
+
+.intro-bg-overlay {
+  position: absolute;
+  inset: 0;
+  /* Deep navy vignette: preserves chart on left and gold bars on right while ensuring center readability */
+  background: 
+    radial-gradient(ellipse 65% 65% at 50% 50%, rgba(5, 8, 17, 0.72) 0%, rgba(5, 8, 17, 0.45) 50%, rgba(5, 8, 17, 0.75) 100%),
+    linear-gradient(to bottom, rgba(5, 8, 17, 0.65) 0%, rgba(5, 8, 17, 0.25) 45%, rgba(5, 8, 17, 0.75) 100%);
+  pointer-events: none;
+}
+
+/* Background Atmospheric Canvas */
+.intro-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: 
+    radial-gradient(circle at 50% 45%, rgba(212, 175, 55, 0.08) 0%, transparent 60%),
+    radial-gradient(circle at 50% 50%, rgba(0, 229, 255, 0.04) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+/* Orbital Golden Rings */
+.intro-orbital-wrapper {
+  position: relative;
+  z-index: 5;
+  width: 280px;
+  height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.intro-ring {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.intro-ring-outer {
+  inset: -36px;
+  border: 1px dashed rgba(212, 175, 55, 0.3);
+  animation: introRotateRing 30s linear infinite;
+}
+
+.intro-ring-mid {
+  inset: -18px;
+  border: 1px solid rgba(0, 229, 255, 0.25);
+  animation: introRotateRingRev 24s linear infinite;
+}
+
+.intro-ring-inner {
+  inset: -6px;
+  border: 1px solid rgba(251, 191, 36, 0.4);
+  box-shadow: 0 0 30px rgba(212, 175, 55, 0.2);
+}
+
+/* Logo & Awakening Effect */
+.intro-logo-container {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: introAwakenLogo 2.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity, filter;
+}
+
+.intro-logo-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 50%;
+  box-shadow: 0 0 45px rgba(212, 175, 55, 0.45), 0 0 90px rgba(0, 229, 255, 0.18);
+  border: 2px solid rgba(212, 175, 55, 0.7);
+  background-color: #080c16;
+}
+
+/* Dynamic Radial Iris Sweep across Logo */
+.intro-eye-light-sweep {
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.6) 0%, rgba(251, 191, 36, 0.3) 40%, transparent 70%);
+  mix-blend-mode: overlay;
+  animation: introEyeAwaken 2.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  pointer-events: none;
+}
+
+/* Brand Welcome Text Stage */
+.intro-text-stage {
+  margin-top: 36px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  opacity: 0;
+  transform: translateY(14px);
+  animation: introTextReveal 1.2s cubic-bezier(0.16, 1, 0.3, 1) 1.8s forwards;
+  position: relative;
+  z-index: 10;
+}
+
+.intro-welcome-heading {
+  font-family: var(--font-brand);
+  font-size: 2.1rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  background: linear-gradient(135deg, #ffffff 0%, #fef08a 30%, #d4af37 70%, #fef08a 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: introShimmer 3s linear infinite;
+  line-height: 1.2;
+}
+
+.intro-sub-descriptor {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent-cyan);
+  opacity: 0.9;
+}
+
+/* Enter Website Primary CTA Button */
+.intro-enter-btn {
+  margin-top: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 13px 34px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, #fef08a 0%, #d4af37 40%, #b8860b 80%, #fef08a 100%);
+  background-size: 200% auto;
+  color: #060a14;
+  font-family: var(--font-brand);
+  font-size: 0.96rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  border: 1px solid rgba(254, 240, 138, 0.7);
+  cursor: pointer;
+  box-shadow: 
+    0 0 0 1px rgba(212, 175, 55, 0.4),
+    0 8px 25px rgba(212, 175, 55, 0.35),
+    0 0 45px rgba(212, 175, 55, 0.25);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+  animation: introButtonGlow 3s ease-in-out infinite;
+}
+
+.intro-enter-btn:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 
+    0 0 0 2px rgba(254, 240, 138, 0.9),
+    0 12px 35px rgba(212, 175, 55, 0.55),
+    0 0 60px rgba(212, 175, 55, 0.45);
+  background-position: right center;
+  color: #02050b;
+}
+
+.intro-enter-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.intro-enter-arrow {
+  transition: transform 0.25s ease;
+}
+
+.intro-enter-btn:hover .intro-enter-arrow {
+  transform: translateX(4px);
+}
+
+.intro-enter-sparkle {
+  color: #0a1122;
+  opacity: 0.9;
+}
+
+@keyframes introButtonGlow {
+  0%, 100% {
+    box-shadow: 
+      0 0 0 1px rgba(212, 175, 55, 0.4),
+      0 8px 25px rgba(212, 175, 55, 0.35),
+      0 0 45px rgba(212, 175, 55, 0.25);
+  }
+  50% {
+    box-shadow: 
+      0 0 0 2px rgba(254, 240, 138, 0.7),
+      0 12px 32px rgba(212, 175, 55, 0.5),
+      0 0 60px rgba(212, 175, 55, 0.4);
+  }
+}
+
+
+
+/* Subtle Golden Particle Dots */
+.intro-particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background-color: var(--gold-bright);
+  border-radius: 50%;
+  box-shadow: 0 0 6px var(--gold-bright);
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* Keyframe Animations */
+@keyframes introAwakenLogo {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateY(10px);
+    filter: blur(10px) brightness(0.6);
+  }
+  40% {
+    opacity: 0.8;
+    filter: blur(2px) brightness(1.2);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0px) brightness(1);
+  }
+}
+
+@keyframes introEyeAwaken {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.3);
+  }
+}
+
+@keyframes introTextReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes introRotateRing {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes introRotateRingRev {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(-360deg); }
+}
+
+@keyframes introShimmer {
+  to {
+    background-position: 200% center;
+  }
+}
+
+/* Reduced Motion Mode */
+@media (prefers-reduced-motion: reduce) {
+  .intro-logo-container {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+  .intro-ring-outer, .intro-ring-mid {
+    animation: none;
+  }
+  .intro-eye-light-sweep {
+    display: none;
+  }
+  .intro-text-stage {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 640px) {
+  .intro-bg-img {
+    object-position: 72% center;
+  }
+  .intro-orbital-wrapper {
+    width: 220px;
+    height: 220px;
+  }
+  .intro-logo-container {
+    width: 150px;
+    height: 150px;
+  }
+  .intro-welcome-heading {
+    font-size: 1.65rem;
+  }
+  .intro-sub-descriptor {
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+  }
+  .intro-enter-btn {
+    padding: 11px 24px;
+    font-size: 0.88rem;
+    margin-top: 20px;
+  }
+}
