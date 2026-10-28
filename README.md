@@ -1,145 +1,217 @@
-# SwarnaDrishti — Commodity Derivatives Intelligence Platform
-> Quantitative Relative-Value Intelligence for MCX Gold Futures
+This application is to provide insight into how trading works by providing numeric values for Commodity Derivatives so that the user can see the value. This application makes use of Data.
 
----
+This project makes use of every layer of development. The application contains a front-end, a Python backend and a secure data layer. This application aims to help the user see how trading works by making use of data.
 
-## 1. Project Overview
+**[Current Status]**
 
-**SwarnaDrishti** (स्वर्णदृष्टि - *The Golden Vision*) is an institutional-grade commodity derivatives research workstation and intelligence platform engineered for Multi Commodity Exchange of India (MCX) Gold Futures relative-value analytics.
+This is a test application that makes use of the data. It is not intended to be used for real trading. There will be no trading tips or financial advice.
 
-The platform transforms daily Multi Commodity Exchange of India (**MCX**) settlement data into transparent, explainable relative-value analytics across four gold futures contracts:
+**Overview**
 
-| Contract Symbol | Trading Unit | Quotation Basis | Deliverable Purity | Normalization Factor |
-|---|---|---|---|---|
-| **GOLDM** (Gold Mini) | 100 grams | Rs. per 10 grams | 995 Fine Gold | Fine-gold assay adjusted to 999 |
-| **GOLDTEN** (Gold 10) | 10 grams | Rs. per 10 grams | 995 Fine Gold | Fine-gold assay adjusted to 999 |
-| **GOLDGUINEA** | 8 grams | Rs. per 8 grams | 999 Fine Gold | Quoted unit converted to 10g |
-| **GOLDPETAL** | 1 gram | Rs. per 1 gram | 999 Fine Gold | Micro-unit scaled to 10g |
+The application makes use of Data from the commodity market and displays this data onto the website. This can be used to help understand some of the strategies and how successful they have been.
 
----
+**Features**
 
-## 2. Brand Identity & Visual Assets
+**Historical Analytics** - Insight into the results and records made.
 
-- **Official Brand Mark:** Supplied orbital gold emblem with central coin/eye motif, candlestick bars, and blue constellation nodes located at `public/assets/swarnadrishti-logo.png`.
-- **Favicon:** Clean circular asset at `public/favicon.png`.
-- **Palette:** Midnight navy (`#060912`), deep graphite (`#0A0F1D`), slate surfaces (`#141D33`), official brand gold (`#D4AF37`, `#FBBF24`), electric cyan (`#00E5FF`), restrained jade green (`#10B981`), and amber warnings (`#F59E0B`).
-- **Typography:** Modern high-legibility sans **Manrope** + **Inter** for headings and narrative text, with **JetBrains Mono** for financial tabular lining numerals.
+**Analyse** - Analyse the numeric data to find out how successful the strategy was.
 
----
+**Visualise** - Using visualisations to see how much money have been made over the period with markers for each trade.
 
-## 3. Site Navigation & Route Mapping
+**Scanner data** - Use scanner data to further aid with analysis.
 
-### Public Presentation Layer
-- `/` — **Public Homepage:** Editorial hero, problem statement, solution architecture, 12-feature showcase, 7-stage analytical pipeline, and trust/methodology disclosure.
+**REST API** - API connects the end of the website to the backend to retrieve data and perform calculations.
 
-### Analytical Research Workstation
-- `/app` — **Market Overview:** Summary KPIs, normalized price landscape time-series (Rs./10g 999 fine basis), RV opportunity scatter plot, and latest activity.
-- `/app/scanner` — **Opportunity Scanner:** Main discovery engine with multi-criteria filtering, table sorting, CSV export, and slide-over SignalGuard proof.
-- `/app/rv-lab` — **Relative Value Lab:** Deep pair investigation with 4 linked charts: Normalized Prices, Observed Spread, Fair Spread & Residual, and Robust Z-Score with $\pm 2.0\sigma$ bands.
-- `/app/fair-value` — **Fair Value & DNA:** 30-day rolling median baseline, Contract DNA specifications audit, and "Why is this spread unusual?" explainability panel.
-- `/app/liquidity-lifecycle` — **Liquidity & Lifecycle:** Volume & Open Interest velocity, 5-day physical delivery tender countdown, and holding constraint warnings.
-- `/app/cost-estimator` — **Cost Estimator:** Interactive friction simulator (brokerage, CTT 0.01%, MCX turnover fees 0.00325%, GST 18%, slippage).
-- `/app/survival-signalguard` — **SignalGuard Engine:** 5-stage gatekeeper matrix auditing statistical significance, cost hurdles, liquidity proxies, and expiry alignment.
-- `/app/simulator` — **What-If Simulator:** Stress-testing engine evaluating surviving net edge under elevated slippage and horizon variations.
-- `/app/backtesting` — **Walk-Forward Backtesting:** Out-of-sample historical validation, portfolio equity curve vs. buy-and-hold MCX Gold benchmark, drawdown, and trade log.
-- `/app/attribution` — **Gold-Neutral Attribution:** Waterfall decomposition isolating Relative-Value Alpha from Directional Gold Beta (verified $\beta \approx 0.04$).
-- `/app/edge-survival` — **Edge Survival Pipeline:** 7-stage visual pipeline proving how gross pricing differences withstand real-world frictions.
-- `/app/alerts` — **Alerts & Surveillance:** Event logs tracking threshold breaks, physical tender windows, and proactive cost suppressions.
-- `/app/methodology` — **Methodology & Diagnostics:** MCX Daily Bhavcopy ingestion diagnostics, zero-missing audit, and normalization formulas.
-- `/app/settings` — **System Settings:** API base URL configuration, Live vs. Offline Test Harness toggles, and user friction assumptions.
+**Database** - Using SQLAlchemy to store and manage the data. By default using SQLite but the option is there to use Postgresql.
 
-*(Note: Legacy URLs like `/scanner`, `/rv-lab`, `/backtesting` automatically forward to `/app/...` for seamless backwards compatibility).*
+**Migrations** - Migrate the data using alembic.
 
----
+**Testing** - Contains testing to ensure the changes made to the API and DB work as indented.
 
-## 4. Setup & Running the Application
+**Tech Stack**
 
-### Prerequisites
-- Node.js v18+ (tested on Node.js v20 LTS)
-- Python 3.10+ (tested on Python 3.15)
+Layer Tech
 
-### Step 1: Environment Configuration
-Copy `.env.example` to `.env` (or use the preconfigured defaults):
-```bash
-# Windows PowerShell
-Copy-Item .env.example .env
+Front End React, Vite, JavaScript
 
-# macOS / Linux
-cp .env.example .env
-```
+Back End Python FastAPI
 
-### Step 2: Backend Setup & Database Ingestion
-In a terminal, navigate to the `backend` folder:
+Database SQLite, PostgreSQL (Can be change)
 
-```bash
-cd backend
+ORM SQLAlchemy
 
-# 1. Install dependencies
-python -m pip install -r requirements.txt
+Migrations Alembic
 
-# 2. Run idempotent database ingestion (creates SQLite DB & imports 78 canonical trades)
-python importer.py
+API Docs FastAPI / OpenAPI
 
-# 3. Start the FastAPI backend server
-python -m uvicorn api:app --reload --host 127.0.0.1 --port 8000
-```
-* **API Health Check:** `http://localhost:8000/api/health`
-* **Swagger/OpenAPI Docs:** `http://localhost:8000/docs`
+Data Types JSON, CSV
 
-### Step 3: Frontend Setup & Development Server
-In a second terminal, from the project root:
+**Project Structure**
 
-```bash
-# 1. Install dependencies
+swarnadrishti-intelligence/
+
+backend/
+
+api.py
+
+calculations.py
+
+importer.py
+
+requirements.txt
+
+db/
+
+alembic/
+
+data/
+
+docs/
+
+API_REFERENCE.md
+
+DATABASE_SCHEMA.md
+
+IMPLEMENTATION_AUDIT.md
+
+PROJECT_CONTEXT.md
+
+RUNBOOK.md
+
+TEST_REPORT.md
+
+public/
+
+src/
+
+.env.example
+
+.gitignore
+
+index.html
+
+package.json
+
+README.md
+
+**Getting Started**
+
+**Requirements**
+
+Ensure you have the following installed:
+
+Node.js and npm
+
+Python 3.x
+
+Git
+
+**1. Clone the Repo**
+
+git clone https://github.com/mohdmubeen3/swarnadrishti-intelligence.git
+
+cd swarnadrishti-intelligence
+
+**2. Front End**
+
+Navigate to the folder. Inside run:
+
 npm install
 
-# 2. Start Vite development server
 npm run dev
-```
-Open **`http://localhost:3000`** in your browser.
 
-### Step 4: Production Build
-```bash
-# Production bundle compilation
-npm run build
+This will open the website in your terminal.
 
-# Preview production build locally
-npm run preview
-```
+**3. Back End**
 
----
+Open a terminal into the project folder.
 
-## 5. Verification & Testing
+Create a virtual environment:
 
-### Run Backend Pytest Suite
-From the `backend` directory:
-```bash
-python -m pytest -v
-```
-*(All 11 tests pass, verifying real DB health checks, canonical 78-trade ingestion, pair summaries, calculation contracts, and structured 501 unavailable endpoints).*
+python -m venv.venv
 
-### Run End-to-End Smoke Test
-From the `backend` directory:
-```bash
+Activate it:
+
+(For Windows Powershell)
+
+.\.venv\Scripts\Activate.ps1
+
+(For Mac OS/Linux)
+
+source.venv/bin/activate
+
+Install the tools then run:
+
+python -m pip install -r backend/requirements.txt
+
+Now run the backend:
+
+python -m uvicorn api:app --reload --appdir backend
+
+You can now see the backend at:
+
+http://localhost:8000/api (API)
+
+http://localhost:8000/docs (Online help for API)
+
+Further information on setting up the database can be found in docs/RUNBOOK.md.
+
+**Testing**
+
+The project contains some testing for the backend, API and DB.
+
+Install the tools for the backend and run:
+
+python -m pytest backend
+
+There is also a test in the root of the project.
+
 python smoke_test.py
-```
-*(Executes a complete 6-stage audit across SQLite persistence, import idempotency, API contracts, quantitative calculations, and production frontend assets).*
 
----
+The results and known information can be found in docs/TEST_REPORT.md.
 
-## 6. Architecture & Documentation Suite
+**Documentation**
 
-Detailed technical documentation is available in the `docs/` folder:
-- [docs/PROJECT_CONTEXT.md](docs/PROJECT_CONTEXT.md) — Product requirements, MCX specifications, and financial guardrails.
-- [docs/IMPLEMENTATION_AUDIT.md](docs/IMPLEMENTATION_AUDIT.md) — Audit of initial repository state, identified gaps, and implemented solutions.
-- [docs/DATABASE_SCHEMA.md](docs/DATABASE_SCHEMA.md) — Database schema, table structures, constraints, and Mermaid ER diagram.
-- [docs/API_REFERENCE.md](docs/API_REFERENCE.md) — Endpoint specifications, request/response models, and error handling.
-- [docs/TEST_REPORT.md](docs/TEST_REPORT.md) — Verified test execution logs and commands.
+All detailed information can be found in the docs/ folder.
 
----
+**Document Information**
 
-## 7. Data Scope & Limitations Notice
+**API Reference** Information about the endpoint and what the API does.
 
-- **Historical Backtest Mode:** All trade logs and scanner displays reflect the validated 78-trade walk-forward historical backtest. They do not constitute live market signals or trading recommendations.
-- **Proxy Return Metric:** The equity curve is an additive cumulative spread-return proxy in percentage points ($\sum \text{NetSpreadChangePct}$), not portfolio ROI, compounded equity, or Rupee P&L.
-- **External Feeds:** Live exchange Bhavcopy ingestion, Level-2 market depth, and broker execution bridges are not connected. Endpoints requiring live exchange feeds transparently return HTTP 501 with clear unavailable notices.
+**Database Schema** Information about how the data has been stored and the models used.
+
+**Implementation Audit** What has been included/excluded from this project.
+
+**Project Context** What this project is trying to achieve and how it works.
+
+**Runbook** How this project can be setup.
+
+**Test Report** What has been done and the results.
+
+**Current Scope and Limitations**
+
+Analysis is done using data from this application.
+
+No real time data or trading support is available.
+
+The API does work with the current data, see the API reference and audit for more information.
+
+Just because it works locally does not mean it is ready for production.
+
+No advice is given.
+
+**Potential Improvements**
+
+Real time and accurate data should be available.
+
+Tools should be provided to analyse the data to see how successful the strategy was.
+
+Better visualisations and comparison tools.
+
+Automated to set up.
+
+Ready for use with monitoring and security tools.
+
+**Contributions**
+
+Everyone is welcome to contribute. If there are any issues please suggest any improvements. Be sure to give details for the issue, what would be expected and any test results.
