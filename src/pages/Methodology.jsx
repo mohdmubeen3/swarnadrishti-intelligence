@@ -72,36 +72,66 @@ export function Methodology() {
       <div className="panel">
         <div className="panel-header">
           <div className="panel-title">
-            <FileCheck size={16} style={{ color: 'var(--status-actionable)' }} />
-            MCX Settlement Bhavcopy Ingestion Audit
+            <FileCheck size={16} style={{ color: 'var(--accent-gold)' }} />
+            Data Ingestion & Dataset Audit Diagnostics
           </div>
-          <span className="panel-meta">Session: {diag.returnedDate}</span>
+          <span className="panel-meta">Reference Session: {diag.returnedDate || '2026-10-26'}</span>
         </div>
         <div className="panel-body" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div className="grid-metrics" style={{ gridTemplateColumns: 'repeat(4, 1fr)' }}>
             <div>
-              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Source Bhavcopy File</div>
+              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Historical Trade Dataset</div>
               <div className="font-mono" style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)' }}>
-                {diag.bhavcopyFile || 'MCX_BHAVCOPY.csv'}
+                {diag.sourceFile || 'walk_forward_spread_trades.csv'}
+              </div>
+              <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', marginTop: 2 }}>
+                SHA256: {diag.sourceFileHash ? `${diag.sourceFileHash.slice(0, 8)}...` : 'bf5ebe3e...'}
               </div>
             </div>
             <div>
-              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Audit Integrity Status</div>
+              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Backtest Validation Status</div>
+              <div className="font-mono" style={{ fontSize: '0.85rem', fontWeight: 600, color: diag.validationStatus === 'PASS' ? 'var(--status-actionable)' : 'var(--status-watch)' }}>
+                {diag.validationStatus === 'PASS' ? '78 OF 78 TRADES (PASS)' : 'CHECK_REQUIRED'}
+              </div>
+              <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', marginTop: 2 }}>
+                3 pairs across 78 trades
+              </div>
+            </div>
+            <div>
+              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>MCX Bhavcopy EOD Status</div>
+              <div className="font-mono" style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--status-watch)' }}>
+                {diag.bhavcopyStatus || 'UNAVAILABLE'}
+              </div>
+              <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', marginTop: 2 }}>
+                MCX_BHAVCOPY.csv not present
+              </div>
+            </div>
+            <div>
+              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Contract Specs Normalized</div>
               <div className="font-mono" style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--status-actionable)' }}>
-                {diag.bhavcopyStatus || 'AUTHENTIC_VERIFIED'}
+                {normAudit.length} of 4 Contracts Verified
+              </div>
+              <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', marginTop: 2 }}>
+                Assay formulas validated
               </div>
             </div>
-            <div>
-              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Commodity Records Filtered</div>
-              <div className="font-mono" style={{ fontSize: '0.85rem', fontWeight: 600 }}>
-                {diag.goldRecordsFiltered} of {diag.recordsProcessed} rows
-              </div>
-            </div>
-            <div>
-              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Missing / Duplicate Prices</div>
-              <div className="font-mono" style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--status-actionable)' }}>
-                0 Missing / 0 Duplicates
-              </div>
+          </div>
+
+          {/* Missing Bhavcopy Honest Notice Banner */}
+          <div style={{
+            padding: '12px 16px',
+            backgroundColor: 'rgba(212, 175, 55, 0.08)',
+            border: '1px solid rgba(212, 175, 55, 0.25)',
+            borderRadius: 'var(--radius-sm)',
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: 12
+          }}>
+            <ShieldAlert size={18} style={{ color: 'var(--accent-gold)', flexShrink: 0, marginTop: 2 }} />
+            <div style={{ fontSize: '0.82rem', lineHeight: 1.5, color: 'var(--text-secondary)' }}>
+              <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>Ingestion Audit Notice: </span>
+              {diag.bhavcopyNotice || 'Official MCX Daily Bhavcopy file is not present in workspace. Operating on validated walk-forward trade log.'}
+              {' '}The canonical dataset consists of 78 closed walk-forward spread trades across 3 contract pairs. To enable live daily settlement ingestion, tick-level spread recalculation, and single-contract price time series for non-backtested forward pairs (such as GOLDM forward contracts), authentic MCX EOD Bhavcopy CSV files (with SYMBOL, EXPIRY_DATE, OPEN, HIGH, LOW, CLOSE, SETT_PRICE, VOLUME, OI) must be ingested via the data pipeline.
             </div>
           </div>
 

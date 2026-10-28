@@ -55,40 +55,91 @@ The platform transforms daily Multi Commodity Exchange of India (**MCX**) settle
 ## 4. Setup & Running the Application
 
 ### Prerequisites
-- Node.js v18+ (tested on Node.js v24)
-- npm or pnpm
+- Node.js v18+ (tested on Node.js v20 LTS)
+- Python 3.10+ (tested on Python 3.15)
 
-### Quickstart
+### Step 1: Environment Configuration
+Copy `.env.example` to `.env` (or use the preconfigured defaults):
+```bash
+# Windows PowerShell
+Copy-Item .env.example .env
 
-1. **Install dependencies:**
-   ```bash
-   npm install
-   ```
+# macOS / Linux
+cp .env.example .env
+```
 
-2. **Configure environment:**
-   Copy `.env.example` to `.env`:
-   ```bash
-   cp .env.example .env
-   ```
-   *(Default `VITE_API_BASE_URL=http://localhost:8000/api`)*
+### Step 2: Backend Setup & Database Ingestion
+In a terminal, navigate to the `backend` folder:
 
-3. **Start local development server:**
-   ```bash
-   npm run dev
-   ```
-   Open `http://localhost:3000` in your browser.
+```bash
+cd backend
 
-4. **Production Build:**
-   ```bash
-   npm run build
-   npm run preview
-   ```
+# 1. Install dependencies
+python -m pip install -r requirements.txt
+
+# 2. Run idempotent database ingestion (creates SQLite DB & imports 78 canonical trades)
+python importer.py
+
+# 3. Start the FastAPI backend server
+python -m uvicorn api:app --reload --host 127.0.0.1 --port 8000
+```
+* **API Health Check:** `http://localhost:8000/api/health`
+* **Swagger/OpenAPI Docs:** `http://localhost:8000/docs`
+
+### Step 3: Frontend Setup & Development Server
+In a second terminal, from the project root:
+
+```bash
+# 1. Install dependencies
+npm install
+
+# 2. Start Vite development server
+npm run dev
+```
+Open **`http://localhost:3000`** in your browser.
+
+### Step 4: Production Build
+```bash
+# Production bundle compilation
+npm run build
+
+# Preview production build locally
+npm run preview
+```
 
 ---
 
-## 5. Offline Test Harness vs. Live Production Pipeline
+## 5. Verification & Testing
 
-To provide evaluators and hackathon judges immediate, zero-friction inspection without requiring an active external database or running MCX ingestion daemon:
-- By default, the application runs with the **Offline Test Harness** active, populating the workstation with authentic MCX Bhavcopy settlement records from October 2026.
-- Users can toggle to **Live MCX Backend** at any moment via the top-bar badge or Settings page.
-- When connected to a live backend, real API responses take over. If the backend is offline, high-fidelity `BackendConnectionRequired` and `ErrorState` components guide the user on endpoint connectivity.
+### Run Backend Pytest Suite
+From the `backend` directory:
+```bash
+python -m pytest -v
+```
+*(All 11 tests pass, verifying real DB health checks, canonical 78-trade ingestion, pair summaries, calculation contracts, and structured 501 unavailable endpoints).*
+
+### Run End-to-End Smoke Test
+From the `backend` directory:
+```bash
+python smoke_test.py
+```
+*(Executes a complete 6-stage audit across SQLite persistence, import idempotency, API contracts, quantitative calculations, and production frontend assets).*
+
+---
+
+## 6. Architecture & Documentation Suite
+
+Detailed technical documentation is available in the `docs/` folder:
+- [docs/PROJECT_CONTEXT.md](docs/PROJECT_CONTEXT.md) — Product requirements, MCX specifications, and financial guardrails.
+- [docs/IMPLEMENTATION_AUDIT.md](docs/IMPLEMENTATION_AUDIT.md) — Audit of initial repository state, identified gaps, and implemented solutions.
+- [docs/DATABASE_SCHEMA.md](docs/DATABASE_SCHEMA.md) — Database schema, table structures, constraints, and Mermaid ER diagram.
+- [docs/API_REFERENCE.md](docs/API_REFERENCE.md) — Endpoint specifications, request/response models, and error handling.
+- [docs/TEST_REPORT.md](docs/TEST_REPORT.md) — Verified test execution logs and commands.
+
+---
+
+## 7. Data Scope & Limitations Notice
+
+- **Historical Backtest Mode:** All trade logs and scanner displays reflect the validated 78-trade walk-forward historical backtest. They do not constitute live market signals or trading recommendations.
+- **Proxy Return Metric:** The equity curve is an additive cumulative spread-return proxy in percentage points ($\sum \text{NetSpreadChangePct}$), not portfolio ROI, compounded equity, or Rupee P&L.
+- **External Feeds:** Live exchange Bhavcopy ingestion, Level-2 market depth, and broker execution bridges are not connected. Endpoints requiring live exchange feeds transparently return HTTP 501 with clear unavailable notices.

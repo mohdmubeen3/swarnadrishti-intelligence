@@ -1,403 +1,69 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import {
-  Radar,
-  Filter,
-  ArrowUpDown,
-  Search,
-  ExternalLink,
-  Info,
-  X,
-  ShieldCheck,
-  Activity,
-  Layers,
-  SlidersHorizontal,
-  Download
-} from 'lucide-react';
-import {
-  ResponsiveContainer,
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  CartesianGrid,
-  ReferenceLine
-} from 'recharts';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Radar, RefreshCw, Search, Download, History } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { relativeValueService } from '../services';
-import { formatPrice, formatZScore, formatINR, formatDate } from '../utils/formatters';
-import {
-  LoadingState,
-  EmptyState,
-  ErrorState,
-  SignalBadge,
-  ExplanationPanel
-} from '../components/common/States';
+import { LoadingState, EmptyState, ErrorState } from '../components/common/States';
+
+const fmt = (v, d = 4) => Number.isFinite(Number(v)) ? Number(v).toFixed(d) : '—';
 
 export function OpportunityScanner() {
-  const navigate = useNavigate();
-  const { selectedDate, setSelectedPair } = useApp();
-
+  const { selectedDate } = useApp();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [pairs, setPairs] = useState([]);
-  const [summary, setSummary] = useState({});
-
-  // Slide-over inspection drawer for selected pair
-  const [inspectPair, setInspectPair] = useState(null);
-
-  // Filters
-  const [filterSignal, setFilterSignal] = useState('ALL');
-  const [filterLegA, setFilterLegA] = useState('ALL');
-  const [minZScore, setMinZScore] = useState(0);
-  const [minNetEdge, setMinNetEdge] = useState(-50);
-  const [searchQuery, setSearchQuery] = useState('');
-
-  // Sorting
-  const [sortField, setSortField] = useState('robustZScore');
-  const [sortAsc, setSortAsc] = useState(false);
+  const [data, setData] = useState(null);
+  const [search, setSearch] = useState('');
 
   const fetchScanner = async () => {
     setLoading(true);
     setError(null);
-    try {
-      const data = await relativeValueService.getOpportunityScanner(selectedDate);
-      setPairs(data.pairs || []);
-      setSummary(data.summary || {});
-      if (data.pairs && data.pairs.length > 0 && !inspectPair) {
-        setInspectPair(data.pairs[0]);
-      }
-    } catch (err) {
-      setError(err);
-    } finally {
-      setLoading(false);
-    }
+    try { setData(await relativeValueService.getOpportunityScanner(selectedDate)); }
+    catch (err) { setError(err); }
+    finally { setLoading(false); }
   };
 
-  useEffect(() => {
-    fetchScanner();
-  }, [selectedDate]);
+  useEffect(() => { fetchScanner(); }, [selectedDate]);
 
-  // Filtering logic
-  const filteredPairs = pairs.filter(p => {
-    if (filterSignal !== 'ALL' && p.signalStatus !== filterSignal) return false;
-    if (filterLegA !== 'ALL' && p.legA !== filterLegA && p.legB !== filterLegA) return false;
-    if (Math.abs(p.robustZScore) < Number(minZScore)) return false;
-    if (p.estimatedNetEdge < Number(minNetEdge)) return false;
-    if (searchQuery && !p.pair.toLowerCase().includes(searchQuery.toLowerCase())) return false;
-    return true;
-  });
-
-  // Sorting logic
-  const sortedPairs = [...filteredPairs].sort((a, b) => {
-    let aVal = a[sortField];
-    let bVal = b[sortField];
-
-    if (sortField === 'robustZScore') {
-      aVal = Math.abs(a.robustZScore);
-      bVal = Math.abs(b.robustZScore);
-    }
-
-    if (aVal < bVal) return sortAsc ? -1 : 1;
-    if (aVal > bVal) return sortAsc ? 1 : -1;
-    return 0;
-  });
-
-  const handleSort = (field) => {
-    if (sortField === field) {
-      setSortAsc(!sortAsc);
-    } else {
-      setSortField(field);
-      setSortAsc(false);
-    }
-  };
+  const trades = useMemo(() => {
+    const all = Array.isArray(data?.trades) ? data.trades : [];
+    const q = search.trim().toLowerCase();
+    return q ? all.filter(t => [t.pair, t.direction, t.exitReason, t.status].some(v => String(v || '').toLowerCase().includes(q))) : all;
+  }, [data, search]);
 
   const exportCSV = () => {
-    if (sortedPairs.length === 0) return;
-    const headers = ['Pair', 'ObservedSpread', 'FairSpread', 'Residual', 'RobustZScore', 'LiquidityScore', 'EstimatedNetEdge', 'DaysToExpiry', 'SignalStatus'];
-    const rows = sortedPairs.map(p => [
-      p.pair,
-      p.observedSpread,
-      p.estimatedFairSpread,
-      p.residual,
-      p.robustZScore,
-      p.liquidityScore,
-      p.estimatedNetEdge,
-      p.daysToExpiry,
-      p.signalStatus
-    ]);
-    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement('a');
-    link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `SwarnaDrishti_Scanner_${selectedDate}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    if (!trades.length) return;
+    const columns = ['pair','entryDate','exitDate','expiryDate','direction','entryZ','exitZ','netReturnPct','exitReason','status'];
+    const quote = (v) => `"${String(v ?? '').replaceAll('"', '""')}"`;
+    const csv = [columns.join(','), ...trades.map(t => columns.map(c => quote(t[c])).join(','))].join('\r\n');
+    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
+    const link = document.createElement('a'); link.href = url; link.download = 'SwarnaDrishti_Historical_Closed_Trades.csv'; link.click(); URL.revokeObjectURL(url);
   };
 
-  if (loading) {
-    return <LoadingState message="Scanning relative-value pricing models and calculating SignalGuard bounds..." />;
-  }
+  if (loading) return <LoadingState message="Loading recorded historical closed trades…" />;
+  if (error) return <ErrorState error={error} onRetry={fetchScanner} />;
 
-  if (error) {
-    return <ErrorState error={error} onRetry={fetchScanner} />;
-  }
-
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-      {/* Header */}
-      <div className="page-header">
-        <div className="page-title-group">
-          <h1>
-            <Radar size={22} style={{ color: 'var(--accent-cyan)' }} />
-            Opportunity Scanner
-          </h1>
-          <p className="page-subtitle">
-            Statistically anomalous price relationships filtered through rigorous liquidity, transaction cost, and lifecycle hurdles.
-          </p>
-        </div>
-        <div className="page-actions">
-          <button className="btn btn-secondary btn-sm" onClick={exportCSV} title="Export current scan records as CSV">
-            <Download size={14} />
-            Export CSV
-          </button>
-        </div>
+  return <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+    <div className="page-header">
+      <div className="page-title-group">
+        <h1><Radar size={22} style={{ color: 'var(--accent-cyan)' }} /> Historical Trade Scanner</h1>
+        <p className="page-subtitle">Browse closed trades from the saved walk-forward backtest. This is not a live signal scanner and does not generate entry recommendations.</p>
       </div>
-
-      {/* Filter Toolbar */}
-      <div className="filter-bar">
-        <div className="filter-group">
-          <Search size={14} style={{ color: 'var(--text-muted)' }} />
-          <input
-            type="text"
-            placeholder="Search pair..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            style={{ width: 140 }}
-          />
-        </div>
-
-        <div className="filter-group">
-          <span className="filter-label">Contract:</span>
-          <select value={filterLegA} onChange={(e) => setFilterLegA(e.target.value)}>
-            <option value="ALL">Any Contract</option>
-            <option value="GOLDM">GOLDM</option>
-            <option value="GOLDTEN">GOLDTEN</option>
-            <option value="GOLDGUINEA">GOLDGUINEA</option>
-            <option value="GOLDPETAL">GOLDPETAL</option>
-          </select>
-        </div>
-
-        <div className="filter-group">
-          <span className="filter-label">Signal Status:</span>
-          <select value={filterSignal} onChange={(e) => setFilterSignal(e.target.value)}>
-            <option value="ALL">All Statuses</option>
-            <option value="ACTIONABLE">Actionable Only</option>
-            <option value="WATCH">Watch Only</option>
-            <option value="NO_SIGNAL">No Signal</option>
-          </select>
-        </div>
-
-        <div className="filter-group">
-          <span className="filter-label">Min |Z|:</span>
-          <select value={minZScore} onChange={(e) => setMinZScore(Number(e.target.value))}>
-            <option value="0">All (|Z| ≥ 0)</option>
-            <option value="1.0">≥ 1.0σ</option>
-            <option value="1.5">≥ 1.5σ</option>
-            <option value="2.0">≥ 2.0σ (Entry Hurdle)</option>
-          </select>
-        </div>
-
-        <div className="filter-group">
-          <span className="filter-label">Min Net Edge:</span>
-          <select value={minNetEdge} onChange={(e) => setMinNetEdge(Number(e.target.value))}>
-            <option value="-50">All</option>
-            <option value="0">&gt; ₹0 (Profitable)</option>
-            <option value="20">&gt; ₹20 / 10g</option>
-          </select>
-        </div>
-
-        <div style={{ marginLeft: 'auto', fontSize: '0.75rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
-          Showing {sortedPairs.length} of {pairs.length} eligible pairs
-        </div>
-      </div>
-
-      {/* Main Table & Inspection Slide-Over Viewport */}
-      <div className={inspectPair ? "grid-main-side" : ""}>
-        {/* Table Panel */}
-        <div className="panel">
-          <div className="panel-header">
-            <div className="panel-title">
-              <Layers size={16} style={{ color: 'var(--accent-cyan)' }} />
-              Eligible Cross-Contract Spread Pairs
-            </div>
-            <span className="panel-meta">Click row to inspect SignalGuard proof</span>
-          </div>
-
-          <div className="table-wrapper">
-            <table className="financial-table">
-              <thead>
-                <tr>
-                  <th onClick={() => handleSort('pair')} className="sortable">
-                    Pair <ArrowUpDown size={11} />
-                  </th>
-                  <th onClick={() => handleSort('observedSpread')} className="sortable num-col">
-                    Observed Spread <ArrowUpDown size={11} />
-                  </th>
-                  <th onClick={() => handleSort('estimatedFairSpread')} className="sortable num-col">
-                    Fair Spread <ArrowUpDown size={11} />
-                  </th>
-                  <th onClick={() => handleSort('residual')} className="sortable num-col">
-                    Residual <ArrowUpDown size={11} />
-                  </th>
-                  <th onClick={() => handleSort('robustZScore')} className="sortable num-col">
-                    Robust Z <ArrowUpDown size={11} />
-                  </th>
-                  <th onClick={() => handleSort('liquidityScore')} className="sortable num-col">
-                    Liquidity <ArrowUpDown size={11} />
-                  </th>
-                  <th onClick={() => handleSort('estimatedNetEdge')} className="sortable num-col">
-                    Net Edge <ArrowUpDown size={11} />
-                  </th>
-                  <th onClick={() => handleSort('daysToExpiry')} className="sortable num-col">
-                    DTE <ArrowUpDown size={11} />
-                  </th>
-                  <th>SignalGuard</th>
-                </tr>
-              </thead>
-              <tbody>
-                {sortedPairs.length === 0 ? (
-                  <tr>
-                    <td colSpan={9} style={{ textAlign: 'center', padding: '36px' }}>
-                      No eligible pairs matched the specified criteria.
-                    </td>
-                  </tr>
-                ) : (
-                  sortedPairs.map(p => {
-                    const isSelected = inspectPair?.id === p.id;
-                    return (
-                      <tr
-                        key={p.id}
-                        className={isSelected ? 'selected' : ''}
-                        onClick={() => setInspectPair(p)}
-                        style={{ cursor: 'pointer' }}
-                      >
-                        <td style={{ fontWeight: 600 }}>{p.pair}</td>
-                        <td className="num-col">₹{formatPrice(p.observedSpread)}</td>
-                        <td className="num-col">₹{formatPrice(p.estimatedFairSpread)}</td>
-                        <td className="num-col" style={{ color: Math.abs(p.residual) > 20 ? 'var(--accent-cyan)' : 'inherit', fontWeight: 600 }}>
-                          ₹{formatPrice(p.residual)}
-                        </td>
-                        <td className="num-col font-mono" style={{ fontWeight: 600 }}>
-                          {formatZScore(p.robustZScore)}
-                        </td>
-                        <td className="num-col font-mono">
-                          {p.liquidityScore?.toFixed(1) || '—'}
-                        </td>
-                        <td className="num-col font-mono" style={{ color: p.estimatedNetEdge > 0 ? 'var(--status-actionable)' : 'var(--status-risk)', fontWeight: 600 }}>
-                          ₹{formatPrice(p.estimatedNetEdge)}
-                        </td>
-                        <td className="num-col font-mono">{p.daysToExpiry}d</td>
-                        <td>
-                          <SignalBadge status={p.signalStatus} reason={p.explanation} />
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* Slide-Over Inspection Panel */}
-        {inspectPair && (
-          <div className="panel" style={{ height: 'fit-content' }}>
-            <div className="panel-header">
-              <div className="panel-title">
-                <ShieldCheck size={16} style={{ color: 'var(--accent-cyan)' }} />
-                SignalGuard Detail: {inspectPair.pair}
-              </div>
-              <button
-                className="btn btn-secondary btn-sm"
-                onClick={() => setInspectPair(null)}
-                title="Close drawer"
-              >
-                <X size={14} />
-              </button>
-            </div>
-            <div className="panel-body" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              {/* Signal Badge & Summary */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <SignalBadge status={inspectPair.signalStatus} reason={inspectPair.explanation} />
-                <span className="font-mono" style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                  Expiry: {inspectPair.expiryA}
-                </span>
-              </div>
-
-              {/* Mathematical Metrics Breakdown */}
-              <div style={{
-                backgroundColor: 'var(--bg-surface)',
-                borderRadius: 'var(--radius-sm)',
-                padding: '12px',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 8,
-                fontSize: '0.78rem'
-              }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ color: 'var(--text-muted)' }}>Observed Basis Spread:</span>
-                  <span className="font-mono">₹{formatPrice(inspectPair.observedSpread)} / 10g</span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ color: 'var(--text-muted)' }}>Rolling Fair Spread:</span>
-                  <span className="font-mono">₹{formatPrice(inspectPair.estimatedFairSpread)} / 10g</span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ color: 'var(--text-muted)' }}>Residual Deviation:</span>
-                  <span className="font-mono" style={{ color: 'var(--accent-cyan)', fontWeight: 600 }}>
-                    ₹{formatPrice(inspectPair.residual)} / 10g
-                  </span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ color: 'var(--text-muted)' }}>Robust Z-Score:</span>
-                  <span className="font-mono" style={{ fontWeight: 600 }}>{formatZScore(inspectPair.robustZScore)}</span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid var(--border-subtle)', paddingTop: 6 }}>
-                  <span style={{ color: 'var(--text-muted)' }}>Estimated Friction Cost:</span>
-                  <span className="font-mono" style={{ color: 'var(--status-risk)' }}>-₹{formatPrice(inspectPair.estimatedTotalCost)} / 10g</span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ color: 'var(--text-muted)' }}>Surviving Net Edge:</span>
-                  <span className="font-mono" style={{ color: inspectPair.estimatedNetEdge > 0 ? 'var(--status-actionable)' : 'var(--status-risk)', fontWeight: 700 }}>
-                    ₹{formatPrice(inspectPair.estimatedNetEdge)} / 10g
-                  </span>
-                </div>
-              </div>
-
-              {/* Explanation Text */}
-              <ExplanationPanel title="SignalGuard Rationale" explanation={inspectPair.explanation}>
-                <div style={{ marginTop: 8, fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                  <strong>Lifecycle Assessment:</strong> {inspectPair.lifecycleAssessment}
-                </div>
-              </ExplanationPanel>
-
-              {/* Action Button */}
-              <button
-                className="btn btn-primary"
-                onClick={() => {
-                  setSelectedPair(inspectPair.id);
-                  navigate(`/app/rv-lab?pair=${inspectPair.id}`);
-                }}
-              >
-                Investigate in RV Lab &rarr;
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
+      <div style={{ display: 'flex', gap: 8 }}><button className="btn btn-secondary btn-sm" onClick={fetchScanner}><RefreshCw size={13} /> Refresh</button><button className="btn btn-secondary btn-sm" onClick={exportCSV} disabled={!trades.length}><Download size={13} /> Export CSV</button></div>
     </div>
-  );
+
+    <div className="grid-metrics">
+      <div className="metric-card"><div className="metric-label">Historical records in window</div><div className="metric-value">{data?.tradeCount ?? trades.length}</div><div className="metric-subtext">{data?.windowStart || '—'} to {data?.windowEnd || '—'}</div></div>
+      <div className="metric-card"><div className="metric-label">Signal mode</div><div className="metric-value" style={{ fontSize: '1.1rem' }}>Historical only</div><div className="metric-subtext">No live market feed connected</div></div>
+      <div className="metric-card"><div className="metric-label">Unique pairs in summary</div><div className="metric-value">{data?.summary?.eligiblePairs ?? data?.pairs?.length ?? '—'}</div><div className="metric-subtext">Pairs in supplied trade log</div></div>
+    </div>
+
+    <section className="panel">
+      <div className="panel-header"><div className="panel-title"><History size={16} style={{ color: 'var(--accent-cyan)' }} /> Closed Trades</div><span className="panel-meta">{trades.length} shown</span></div>
+      <div style={{ padding: '12px 16px' }}><div style={{ display: 'flex', alignItems: 'center', gap: 8, maxWidth: 440, border: '1px solid var(--border-subtle)', borderRadius: 6, padding: '7px 10px' }}><Search size={15} /><input aria-label="Search historical trades" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search pair, direction, exit reason…" style={{ border: 0, outline: 0, width: '100%', background: 'transparent', color: 'var(--text-primary)' }} /></div></div>
+      <div className="table-wrapper"><table className="financial-table"><thead><tr><th>Pair</th><th>Entry date</th><th>Exit date</th><th>Expiry</th><th>Direction</th><th className="num-col">Entry Z</th><th className="num-col">Exit Z</th><th className="num-col">Net spread proxy (pp)</th><th>Exit reason</th><th>Status</th></tr></thead><tbody>
+        {trades.map((t, i) => <tr key={`${t.pair}-${t.entryDate}-${i}`}><td>{t.pair}</td><td>{t.entryDate}</td><td>{t.exitDate}</td><td>{t.expiryDate || '—'}</td><td>{t.direction || '—'}</td><td className="num-col">{fmt(t.entryZ, 3)}</td><td className="num-col">{fmt(t.exitZ, 3)}</td><td className="num-col">{fmt(t.netReturnPct, 5)}</td><td>{t.exitReason || '—'}</td><td>{t.status || 'Closed'}</td></tr>)}
+        {!trades.length && <tr><td colSpan="10"><EmptyState title="No matching historical trades" description="Try a different search term or refresh the saved backtest artifacts." /></td></tr>}
+      </tbody></table></div>
+      <div style={{ padding: '10px 16px', fontSize: '0.75rem', color: 'var(--text-muted)' }}>Net return values are spread-return proxies in percentage points, not rupee P&amp;L. Saved scanner window: {data?.windowStart || '—'} through {data?.windowEnd || '—'}.</div>
+    </section>
+  </div>;
 }

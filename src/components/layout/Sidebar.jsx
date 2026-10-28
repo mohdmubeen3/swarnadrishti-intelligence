@@ -122,7 +122,7 @@ export function Sidebar({ mobileOpen, onCloseMobile }) {
           <div className={`pulse-dot ${backendStatus.isConnected ? '' : 'error'}`} />
           {!collapsed && (
             <span>
-              {isTestMode ? 'Test Harness Mode' : backendStatus.isConnected ? 'MCX Ingestion Live' : 'Backend Disconnected'}
+              {isTestMode ? 'Test Harness Mode' : backendStatus.isConnected ? 'API Connected' : 'Backend Disconnected'}
             </span>
           )}
         </div>

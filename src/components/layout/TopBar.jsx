@@ -16,6 +16,8 @@ import {
 import { useApp } from '../../context/AppContext';
 import { MCX_GOLD_CONTRACTS } from '../../utils/contractSpecs';
 
+import { CustomSelect } from '../common/CustomSelect';
+
 export function TopBar({ onOpenMobile }) {
   const location = useLocation();
   const {
@@ -79,35 +81,27 @@ export function TopBar({ onOpenMobile }) {
 
         <div className="topbar-right">
           {/* Market Data Settlement Date Selector */}
-          <div className="topbar-control-group" title="Select official MCX settlement date">
-            <Calendar size={14} style={{ color: 'var(--gold-bright)' }} />
-            <span className="topbar-control-label">Date</span>
-            <select
-              className="topbar-select"
-              value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
-            >
-              {availableDates.map(d => (
-                <option key={d} value={d}>{d}</option>
-              ))}
-            </select>
-          </div>
+          <CustomSelect
+            value={selectedDate}
+            onChange={setSelectedDate}
+            options={availableDates}
+            label="Date"
+            icon={Calendar}
+            ariaLabel="Select official MCX settlement date"
+          />
 
           {/* Global Contract Filter */}
-          <div className="topbar-control-group" title="Filter by MCX Gold contract symbol">
-            <Filter size={14} style={{ color: 'var(--accent-cyan)' }} />
-            <span className="topbar-control-label">Contract</span>
-            <select
-              className="topbar-select"
-              value={selectedContract}
-              onChange={(e) => setSelectedContract(e.target.value)}
-            >
-              <option value="ALL">ALL CONTRACTS</option>
-              {Object.keys(MCX_GOLD_CONTRACTS).map(sym => (
-                <option key={sym} value={sym}>{sym}</option>
-              ))}
-            </select>
-          </div>
+          <CustomSelect
+            value={selectedContract}
+            onChange={setSelectedContract}
+            options={[
+              { value: 'ALL', label: 'ALL CONTRACTS' },
+              ...Object.keys(MCX_GOLD_CONTRACTS).map(sym => ({ value: sym, label: sym }))
+            ]}
+            label="Contract"
+            icon={Filter}
+            ariaLabel="Filter by MCX Gold contract symbol"
+          />
 
           {/* Test Mode / Live Backend Status Badge */}
           <button
@@ -123,7 +117,7 @@ export function TopBar({ onOpenMobile }) {
             ) : backendStatus.isConnected ? (
               <>
                 <CheckCircle2 size={12} />
-                <span>MCX Live</span>
+                <span>API Connected</span>
               </>
             ) : (
               <>

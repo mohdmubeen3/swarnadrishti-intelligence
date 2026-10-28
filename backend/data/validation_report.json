@@ -1,0 +1,30 @@
+{
+  "status": "PASS",
+  "issues": [],
+  "checks": {
+    "sourceFile": "/content/swarnadrishti_member1/walk_forward_spread_trades.csv",
+    "tradeCount": 78,
+    "pairCount": 3,
+    "phantomEntries_absEntryZ_ge_4": 0,
+    "exits_absExitZ_gt_4": 0,
+    "extremeExitsNotMarkedStopLoss": 0,
+    "entriesInsideExpiryBuffer": 0,
+    "exitsOnOrAfterExpiry": 0,
+    "bufferExitsWithWrongReason": 0,
+    "unknownExitReasons": [],
+    "exitReasonCounts": {
+      "Mean Reversion": 49,
+      "Max Holding": 19,
+      "Expiry Buffer": 7,
+      "End of Segment": 3
+    },
+    "entryZMin": -3.405789800889468,
+    "entryZMax": 2.970185429670515,
+    "exitZMin": -3.047805583587045,
+    "exitZMax": 3.502347368895013,
+    "minExitDTE": 4,
+    "maxExitDTE": 142,
+    "sourceCSV_SHA256": "f428cbecee01463b6af622a985346eaa5b41a6b7feaadb6232f28640fbb35a33"
+  },
+  "generatedAtUTC": "2026-10-28T02:04:42.394719+00:00"
+}

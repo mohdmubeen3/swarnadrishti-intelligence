@@ -22,6 +22,29 @@ export function EmptyState({ title = 'No Eligible Records Found', description = 
 }
 
 export function ErrorState({ error, onRetry }) {
+  const isUnavailable = error?.status === 501 || error?.data?.detail?.status === 'unavailable';
+  const unavailableDetail = error?.data?.detail;
+
+  if (isUnavailable) {
+    const featureName = unavailableDetail?.feature || 'Analytical Module';
+    const explanation = unavailableDetail?.message || error?.message || 'Feature requires active live MCX market data feed.';
+    return (
+      <div className="state-box" style={{ borderColor: 'var(--border-medium)', backgroundColor: 'var(--bg-surface-elevated)' }}>
+        <div className="state-box-title" style={{ color: 'var(--accent-gold)' }}>
+          {featureName} — Live Feed Required
+        </div>
+        <p className="state-box-desc" style={{ color: 'var(--text-secondary)' }}>
+          {explanation}
+        </p>
+        <div className="state-box-meta" style={{ display: 'flex', gap: 16, marginTop: 12, flexWrap: 'wrap' }}>
+          <span><strong>Data Mode:</strong> Historical Backtest Only</span>
+          <span><strong>Exchange Feed:</strong> MCX Real-Time Disconnected</span>
+          {error?.endpoint && <span><strong>Endpoint:</strong> {error.endpoint}</span>}
+        </div>
+      </div>
+    );
+  }
+
   const message = error?.message || 'Failed to communicate with the analytical service.';
   const endpoint = error?.endpoint || '';
   const isNetwork = error?.isNetworkError;

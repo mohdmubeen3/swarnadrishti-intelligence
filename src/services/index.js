@@ -4,6 +4,14 @@
 import { apiRequest } from './apiClient';
 import { API_CONFIG } from '../config/apiConfig';
 
+
+export const historicalResultsService = {
+  async getResults(signal) {
+    const res = await apiRequest('/historical-results', { signal });
+    return res.data;
+  },
+};
+
 export const marketDataService = {
   async getMarketData(date, signal) {
     const res = await apiRequest(API_CONFIG.ENDPOINTS.MARKET_DATA, {

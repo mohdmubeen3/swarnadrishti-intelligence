@@ -15,12 +15,12 @@ export function AppProvider({ children }) {
   const [isTestMode, setIsTestMode] = useState(() => isOfflineTestModeActive());
 
   // Global Date Selection
-  const [selectedDate, setSelectedDate] = useState('2026-10-23');
-  const [availableDates, setAvailableDates] = useState(['2026-10-24', '2026-10-23', '2026-10-22', '2026-10-21', '2026-10-20']);
+  const [selectedDate, setSelectedDate] = useState('2026-10-26');
+  const [availableDates, setAvailableDates] = useState(['2026-10-26', '2026-10-23', '2026-10-22', '2026-10-21', '2026-10-20']);
 
   // Global Contract Selection
   const [selectedContract, setSelectedContract] = useState('ALL');
-  const [selectedPair, setSelectedPair] = useState('GOLDM-GOLDTEN-20261105');
+  const [selectedPair, setSelectedPair] = useState('GOLDGUINEA-GOLDPETAL');
 
   // Backend Health and Connection State
   const [backendStatus, setBackendStatus] = useState({
@@ -68,16 +68,16 @@ export function AppProvider({ children }) {
       const res = await marketDataService.getHealthStatus();
       const latency = Math.round(performance.now() - start);
       setBackendStatus({
-        isConnected: true,
+        isConnected: res?.status === 'ok' || res?.status === 'UP',
         lastChecked: new Date().toISOString(),
         latencyMs: latency,
-        version: res?.version || '1.0.0',
-        pipeline: res?.pipeline || 'MCX_BHAVCOPY',
+        version: res?.version || '1.1.0',
+        pipeline: res?.pipeline || 'historical_backtest_artifacts',
         error: null
       });
     } catch (err) {
       setBackendStatus({
-        isConnected: isTestMode, // In test mode we consider the test harness active
+        isConnected: false,
         lastChecked: new Date().toISOString(),
         latencyMs: null,
         version: null,

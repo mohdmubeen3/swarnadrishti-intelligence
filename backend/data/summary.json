@@ -1,0 +1,48 @@
+{
+  "status": "validated",
+  "generatedFrom": "walk_forward_spread_trades.csv",
+  "tradeCount": 78,
+  "pairCount": 3,
+  "returnMetric": "Sum of NetSpreadChangePct in percentage points; not portfolio return or rupee P&L.",
+  "pairs": [
+    {
+      "pair": "GOLDGUINEA-GOLDPETAL",
+      "trades": 29,
+      "winRatePct": 75.862069,
+      "totalNetReturnPct": 1.776956,
+      "meanNetReturnPct": 0.061274,
+      "maxDrawdownPct": -0.186138,
+      "meanReversionExits": 20,
+      "stopLossExits": 0,
+      "expiryBufferExits": 4,
+      "maxHoldingExits": 4,
+      "endOfSegmentExits": 1
+    },
+    {
+      "pair": "GOLDTEN-GOLDGUINEA",
+      "trades": 23,
+      "winRatePct": 73.913043,
+      "totalNetReturnPct": 1.638319,
+      "meanNetReturnPct": 0.071231,
+      "maxDrawdownPct": -0.834596,
+      "meanReversionExits": 15,
+      "stopLossExits": 0,
+      "expiryBufferExits": 1,
+      "maxHoldingExits": 7,
+      "endOfSegmentExits": 0
+    },
+    {
+      "pair": "GOLDTEN-GOLDPETAL",
+      "trades": 26,
+      "winRatePct": 69.230769,
+      "totalNetReturnPct": 1.528396,
+      "meanNetReturnPct": 0.058784,
+      "maxDrawdownPct": -0.555271,
+      "meanReversionExits": 14,
+      "stopLossExits": 0,
+      "expiryBufferExits": 2,
+      "maxHoldingExits": 8,
+      "endOfSegmentExits": 2
+    }
+  ]
+}

@@ -24,17 +24,19 @@ export class ApiError extends Error {
 export function isOfflineTestModeActive() {
   try {
     const val = localStorage.getItem(API_CONFIG.STORAGE_KEYS.TEST_MODE);
-    // If not set, default to true so judges can immediately test the full workstation UI out-of-the-box!
-    // But it will display a prominent notice that offline test mode is active and let them toggle live backend anytime.
-    return val !== null ? val === 'true' : true;
+    const explicitlySelected = localStorage.getItem('swarnadrishti_test_mode_explicit') === 'true';
+    // Older builds defaulted this preference to true. Require a deliberate selection
+    // in this build before any benchmark/demo response can be served.
+    return explicitlySelected && val === 'true';
   } catch {
-    return true;
+    return false;
   }
 }
 
 export function setOfflineTestMode(enabled) {
   try {
     localStorage.setItem(API_CONFIG.STORAGE_KEYS.TEST_MODE, enabled ? 'true' : 'false');
+    localStorage.setItem('swarnadrishti_test_mode_explicit', 'true');
   } catch (err) {
     console.error('Failed to persist test mode setting', err);
   }
@@ -67,8 +69,10 @@ export async function apiRequest(endpoint, { method = 'GET', body = null, params
   const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.TIMEOUT_MS);
 
   // Link caller signal if provided
+  const forwardAbort = () => controller.abort();
   if (signal) {
-    signal.addEventListener('abort', () => controller.abort());
+    if (signal.aborted) controller.abort();
+    else signal.addEventListener('abort', forwardAbort, { once: true });
   }
 
   try {
@@ -80,6 +84,7 @@ export async function apiRequest(endpoint, { method = 'GET', body = null, params
     });
 
     clearTimeout(timeoutId);
+    if (signal) signal.removeEventListener('abort', forwardAbort);
 
     if (!response.ok) {
       let errorData = null;
@@ -88,7 +93,9 @@ export async function apiRequest(endpoint, { method = 'GET', body = null, params
       } catch {
         errorData = { raw: await response.text() };
       }
-      throw new ApiError(`Backend returned HTTP ${response.status}: ${response.statusText}`, {
+      const detail = errorData?.detail;
+      const detailMessage = typeof detail === 'string' ? detail : detail?.message;
+      throw new ApiError(detailMessage || `Backend returned HTTP ${response.status}: ${response.statusText}`, {
         status: response.status,
         endpoint,
         data: errorData,
@@ -104,6 +111,7 @@ export async function apiRequest(endpoint, { method = 'GET', body = null, params
     };
   } catch (error) {
     clearTimeout(timeoutId);
+    if (signal) signal.removeEventListener('abort', forwardAbort);
     if (error.name === 'AbortError') {
       throw new ApiError('Request timed out or cancelled by client', {
         status: 408,

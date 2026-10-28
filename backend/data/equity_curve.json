@@ -1,0 +1,202 @@
+{
+  "metric": "Cumulative net spread-return proxy",
+  "units": "percentage points",
+  "note": "Additive cumulative spread-return proxy, not a compounded portfolio equity curve or rupee P&L.",
+  "data": [
+    {
+      "date": "2026-07-06",
+      "dailyNetReturnPct": 0.11073653,
+      "cumulativeNetReturnPct": 0.11073653
+    },
+    {
+      "date": "2026-07-07",
+      "dailyNetReturnPct": 0.47360116,
+      "cumulativeNetReturnPct": 0.58433769
+    },
+    {
+      "date": "2026-07-14",
+      "dailyNetReturnPct": 0.23526623,
+      "cumulativeNetReturnPct": 0.81960392
+    },
+    {
+      "date": "2026-07-17",
+      "dailyNetReturnPct": 0.08757215,
+      "cumulativeNetReturnPct": 0.90717608
+    },
+    {
+      "date": "2026-07-21",
+      "dailyNetReturnPct": 0.89895627,
+      "cumulativeNetReturnPct": 1.80613234
+    },
+    {
+      "date": "2026-07-22",
+      "dailyNetReturnPct": 0.13113299,
+      "cumulativeNetReturnPct": 1.93726533
+    },
+    {
+      "date": "2026-07-23",
+      "dailyNetReturnPct": 0.22512709,
+      "cumulativeNetReturnPct": 2.16239243
+    },
+    {
+      "date": "2026-07-27",
+      "dailyNetReturnPct": -0.39955469,
+      "cumulativeNetReturnPct": 1.76283774
+    },
+    {
+      "date": "2026-07-28",
+      "dailyNetReturnPct": 0.06751677,
+      "cumulativeNetReturnPct": 1.83035451
+    },
+    {
+      "date": "2026-07-29",
+      "dailyNetReturnPct": 0.16974592,
+      "cumulativeNetReturnPct": 2.00010043
+    },
+    {
+      "date": "2026-07-30",
+      "dailyNetReturnPct": 0.35105524,
+      "cumulativeNetReturnPct": 2.35115568
+    },
+    {
+      "date": "2026-07-31",
+      "dailyNetReturnPct": 0.39118104,
+      "cumulativeNetReturnPct": 2.74233672
+    },
+    {
+      "date": "2026-08-03",
+      "dailyNetReturnPct": 0.54576811,
+      "cumulativeNetReturnPct": 3.28810483
+    },
+    {
+      "date": "2026-08-10",
+      "dailyNetReturnPct": 0.42248458,
+      "cumulativeNetReturnPct": 3.71058941
+    },
+    {
+      "date": "2026-08-11",
+      "dailyNetReturnPct": 0.30814487,
+      "cumulativeNetReturnPct": 4.01873428
+    },
+    {
+      "date": "2026-08-13",
+      "dailyNetReturnPct": 0.45382,
+      "cumulativeNetReturnPct": 4.47255428
+    },
+    {
+      "date": "2026-08-19",
+      "dailyNetReturnPct": -0.38180224,
+      "cumulativeNetReturnPct": 4.09075204
+    },
+    {
+      "date": "2026-08-20",
+      "dailyNetReturnPct": -0.12535553,
+      "cumulativeNetReturnPct": 3.96539651
+    },
+    {
+      "date": "2026-08-26",
+      "dailyNetReturnPct": 0.2107533,
+      "cumulativeNetReturnPct": 4.17614981
+    },
+    {
+      "date": "2026-09-09",
+      "dailyNetReturnPct": 0.02460299,
+      "cumulativeNetReturnPct": 4.20075279
+    },
+    {
+      "date": "2026-09-11",
+      "dailyNetReturnPct": 0.06672569,
+      "cumulativeNetReturnPct": 4.26747848
+    },
+    {
+      "date": "2026-09-14",
+      "dailyNetReturnPct": 0.01679533,
+      "cumulativeNetReturnPct": 4.28427381
+    },
+    {
+      "date": "2026-09-15",
+      "dailyNetReturnPct": 0.12801262,
+      "cumulativeNetReturnPct": 4.41228644
+    },
+    {
+      "date": "2026-09-16",
+      "dailyNetReturnPct": 0.06013046,
+      "cumulativeNetReturnPct": 4.47241689
+    },
+    {
+      "date": "2026-09-17",
+      "dailyNetReturnPct": 0.21150025,
+      "cumulativeNetReturnPct": 4.68391715
+    },
+    {
+      "date": "2026-09-23",
+      "dailyNetReturnPct": 0.07494763,
+      "cumulativeNetReturnPct": 4.75886478
+    },
+    {
+      "date": "2026-09-25",
+      "dailyNetReturnPct": -0.36689697,
+      "cumulativeNetReturnPct": 4.39196781
+    },
+    {
+      "date": "2026-09-29",
+      "dailyNetReturnPct": 0.05331673,
+      "cumulativeNetReturnPct": 4.44528455
+    },
+    {
+      "date": "2026-09-30",
+      "dailyNetReturnPct": 0.10960591,
+      "cumulativeNetReturnPct": 4.55489046
+    },
+    {
+      "date": "2026-10-05",
+      "dailyNetReturnPct": -0.00336064,
+      "cumulativeNetReturnPct": 4.55152982
+    },
+    {
+      "date": "2026-10-06",
+      "dailyNetReturnPct": -0.26248477,
+      "cumulativeNetReturnPct": 4.28904505
+    },
+    {
+      "date": "2026-10-07",
+      "dailyNetReturnPct": 0.02909865,
+      "cumulativeNetReturnPct": 4.3181437
+    },
+    {
+      "date": "2026-10-08",
+      "dailyNetReturnPct": -0.33710312,
+      "cumulativeNetReturnPct": 3.98104059
+    },
+    {
+      "date": "2026-10-12",
+      "dailyNetReturnPct": 0.61459446,
+      "cumulativeNetReturnPct": 4.59563504
+    },
+    {
+      "date": "2026-10-13",
+      "dailyNetReturnPct": 0.01527421,
+      "cumulativeNetReturnPct": 4.61090925
+    },
+    {
+      "date": "2026-10-14",
+      "dailyNetReturnPct": 0.29514105,
+      "cumulativeNetReturnPct": 4.9060503
+    },
+    {
+      "date": "2026-10-15",
+      "dailyNetReturnPct": 0.05638117,
+      "cumulativeNetReturnPct": 4.96243147
+    },
+    {
+      "date": "2026-10-22",
+      "dailyNetReturnPct": 0.07626523,
+      "cumulativeNetReturnPct": 5.0386967
+    },
+    {
+      "date": "2026-10-26",
+      "dailyNetReturnPct": -0.09502562,
+      "cumulativeNetReturnPct": 4.94367108
+    }
+  ]
+}
